@@ -7,9 +7,9 @@ author:     BY
 header-img: img/post-bg-swift.jpg
 catalog: true
 tags:
-    - iOS
-    - Swift
-    - IBInspectable
+    - Android
+    - Kotlin
+    - Lambda
 ---
 
 
@@ -84,6 +84,18 @@ class MyView {
 在这里 我们不再使用接口 不用重新在类的内部定义一个接口，这无形中会减小JVM的压力（虽然很小但也比没有好）可以看出在kotlin中，函数是可以抽象为一个对象的，在设置了监听后，click事件就可以调用click方法，而内部到底怎么做，就完全是开放的，符合了程序设计的原则，内部不可修改，外部可扩展。
 
 此Lambda表达式的第一个部分 click 是我们可以自己命名的这个高阶函数的名字,:来表示他的调用者类型MyView.()指的是调用他的是MyView对象，并且在高阶函数里可以使用这个MyView对象。（）表示这个高阶函数的参数，由于我们模仿的是View 已经直接直接可以使用了所以此处不传参数也是一样的 如果要写成传参的形式，直接在括号里加上参数类型即可。（注意，高阶函数不支持可变参数）
+
+附上调用示例
+
+```kotlin
+   fun main(){
+            MyView().setOnclickListener {
+                //我想被点击
+                println(text)
+                performClick()
+            }
+        }
+```
 
 > - 
 
