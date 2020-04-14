@@ -92,7 +92,6 @@ class MyView {
             MyView().setOnclickListener {
                 //我想被点击
                 println(text)
-                performClick()
             }
         }
 ```
