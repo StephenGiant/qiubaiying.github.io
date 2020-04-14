@@ -3,7 +3,7 @@ layout:     post
 title:      kotlin的lambda与高阶函数
 subtitle:   kotlin高阶函数用法
 date:       2017-05-05
-author:     BY
+author:     Booker
 header-img: img/post-bg-swift.jpg
 catalog: true
 tags:
@@ -13,7 +13,7 @@ tags:
 ---
 
 
-> 本文首次发布于 [BY Blog](http://stephengiant.github.io), 作者 [@Booker(BY)](http://github.com/StephenGiant) ,转载请保留原文链接.
+> 本文首次发布于 [BookerBlog](http://stephengiant.github.io), 作者 [@Booker](http://github.com/StephenGiant) ,转载请保留原文链接.
 
 # 前言
 
