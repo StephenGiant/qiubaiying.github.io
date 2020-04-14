@@ -4,7 +4,7 @@ title:      kotlin的lambda与高阶函数
 subtitle:   kotlin高阶函数用法
 date:       2017-05-05
 author:     Booker
-header-img: img/post-bg-swift.jpg
+header-img: img/rookie.jpg
 catalog: true
 tags:
     - Android
