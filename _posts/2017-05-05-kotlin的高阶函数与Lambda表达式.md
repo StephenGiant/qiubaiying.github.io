@@ -22,7 +22,8 @@ kotlin语言也使用了很多语言都会使用的高阶函数以及Lambda表�
 众所周知，Java是没有高阶函数概念的，在1.8开始才支持Lambda表达式。在Java里，我们要扩展一个方法，必须自定义一个接口，定义一个抽象方法，再将接口作为形参
 
 `public interface A{`
-			`void method();`
+
+​			`void method();`
 
 `}`
 
