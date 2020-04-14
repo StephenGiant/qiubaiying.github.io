@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      kotlin的lambda与高阶函数
-subtitle:   IBInspectable 在 Swift 中的实际应用
+subtitle:   kotlin高阶函数用法
 date:       2017-05-05
 author:     BY
 header-img: img/post-bg-swift.jpg
