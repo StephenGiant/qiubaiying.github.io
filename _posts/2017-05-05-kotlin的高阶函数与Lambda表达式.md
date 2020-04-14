@@ -27,139 +27,63 @@ kotlin语言也使用了很多语言都会使用的高阶函数以及Lambda表�
 
 `}`
 
+
+
 这对于程序员来说 是比较麻烦的一个方式，有时候我们只是想扩展个方法而已，而当我们需要扩展一系列方法的时候，还是适合使用接口。kotlin的高阶函数就为我们解决了这个问题。
 
 # 正文
 
-在项目中最常遇到的情况是为 view 设置圆角、描边，以及为 文本控件 添加本地化字符串。
+先讲一讲如何在kotlin中使用高阶函数
 
-## 圆角、描边
+高阶函数和Lambda表达式是密不可分的，下面举一个不用Lambda的写法示例
 
-先来看看设置圆角、描边
+```kotlin
+iv_photo.setOnClickListener(object : View.OnClickListener {
+    override fun onClick(v: View?) {
+        //dosomething
+    }
 
-```swift
-extension UIView {
-    @IBInspectable var cornerRadius: CGFloat {
-        get {
-            return layer.cornerRadius
-        }
-        
-        set {
-            layer.cornerRadius = newValue
-            layer.masksToBounds = newValue > 0
-        }
-    }
-    
-    @IBInspectable var borderWidth: CGFloat {
-        get {
-            return layer.borderWidth
-        }
-        set {
-            layer.borderWidth = newValue > 0 ? newValue : 0
-        }
-    }
-    
-    @IBInspectable var borderColor: UIColor {
-        get {
-            return UIColor(cgColor: layer.borderColor!)
-        }
-        set {
-            layer.borderColor = newValue.cgColor
-        }
-    }
+})
+```
+
+这里我们对一个ImageView添加了点击事件 需要创建一个onclick事件监听再重写他的方法，基本和JAVA的写法是一样的，甚至还多了个object: 来声明匿名对象
+
+一样的代码，现在使用Lambda表达式来写
+
+```kotlin
+iv_photo.setOnClickListener{it->
     
 }
 ```
 
-添加完成就可以在 IB 中设置 view 的这些属性了
+这里就省略了很多代码 这个it指的就是我们需要重写的方法的参数 这和Java的Lambda差不多，但是在kotlin中，如果只有一个参数，甚至连it都可以省略
 
-![](https://ww4.sinaimg.cn/large/006tNc79gy1ff9h5afhv2j30f803ajri.jpg)
-
-运行效果
-
-![](https://ww3.sinaimg.cn/large/006tNc79gy1ff9h70z922j30ag061wf7.jpg)
-
-## 利用 @IBDesignable 在 IB 中实时显示 @IBInspectable 的样式
-
-创建一个新的 class 继承 `UIView` ，并且使用 `@IBDesignable` 声明
-
-```swift
-import UIKit
-
-@IBDesignable class IBDesignableView: UIView {
-
+```kotlin
+iv_photo.setOnClickListener{
+    //dosomething
 }
 ```
 
-在 IB 中，选择 view 的 class 为 我们新建的 `IBDesignableView`
+而这三者的写法的运行结果就出来了是一样的
 
+让我们仔细观察下最后一个写法，看上去好像我们传给setOnclickLIstener的参数是一个方法，而且是参数为View的方法，其实这就是相当于高阶函数了。我们用高阶函数也一样可以达到一个监听的效果。
 
-
-![](https://ww1.sinaimg.cn/large/006tNc79gy1ff9hs6z5q1j30fr03vweu.jpg)
-
-这样在 IB 调整属性时，这些属性的变化就会实时显示在 IB 中。
-
-
-## 本地化字符串
-
-本地化字符串的解决方法和上面的添加圆角一样
-
-```swift
-extension UILabel {
-    @IBInspectable var localizedKey: String? {
-        set {
-            guard let newValue = newValue else { return }
-            text = NSLocalizedString(newValue, comment: "")
-        }
-        get { return text }
+```kotlin
+class MyView {
+     val text = "我是字段"
+   private lateinit var click:MyView.()->Unit
+    fun setOnclickListener(click:MyView.()->Unit){
+        this.click = click
     }
-}
-
-extension UIButton {
-    @IBInspectable var localizedKey: String? {
-        set {
-            guard let newValue = newValue else { return }
-            setTitle(NSLocalizedString(newValue, comment: ""), for: .normal)
-        }
-        get { return titleLabel?.text }
-    }
-}
-
-extension UITextField {
-    @IBInspectable var localizedKey: String? {
-        set {
-            guard let newValue = newValue else { return }
-            placeholder = NSLocalizedString(newValue, comment: "")
-        }
-        get { return placeholder }
+    fun performClick(){
+      click()
     }
 }
 ```
 
-这样，在 IB 中我们就可以利用对应类型的 Localized Key 来直接设置本地化字符串了：
+在这里 我们不再使用接口 不用重新在类的内部定义一个接口，这无形中会减小JVM的压力（虽然很小但也比没有好）可以看出在kotlin中，函数是可以抽象为一个对象的，在设置了监听后，click事件就可以调用click方法，而内部到底怎么做，就完全是开放的，符合了程序设计的原则，内部不可修改，外部可扩展。
 
-![](https://ww1.sinaimg.cn/large/006tNc79gy1ff9h94um01j30aj01vjre.jpg)
+此Lambda表达式的第一个部分 click 是我们可以自己命名的这个高阶函数的名字,:来表示他的调用者类型MyView.()指的是调用他的是MyView对象，并且在高阶函数里可以使用这个MyView对象。（）表示这个高阶函数的参数，由于我们模仿的是View 已经直接直接可以使用了所以此处不传参数也是一样的 如果要写成传参的形式，直接在括号里加上参数类型即可。（注意，高阶函数不支持可变参数）
 
+> - 
 
-
-# 结语
-
-`IBInspectable` 可以使用这些的类型
-
-- `Int`
-- `CGFloat`
-- `Double`
-- `String`
-- `Bool`
-- `CGPoint`
-- `CGSize`
-- `CGRect`
-- `UIColor`
-- `UIImage`
-
-合理的使用`@IBInspectable` 能减少很多的模板代码，提高我们的开发效率。
-
-> 参考
-> 
-> -  [《再看关于 Storyboard 的一些争论》](https://onevcat.com/2017/04/storyboard-argue/)
-> - [《@IBDesignable and @IBInspectable in Swift 3》](https://medium.com/@Anantha1992/ibdesignable-and-ibinspectable-in-swift-3-702d7dd00ca)
