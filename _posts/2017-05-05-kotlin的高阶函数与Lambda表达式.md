@@ -96,5 +96,57 @@ class MyView {
         }
 ```
 
-> - 
+> # 在Android项目中使用高阶函数优化
+>
 
+在Android项目中，Retrofit已经成为了主流的网络请求封装框架，很多人会把Call转化成一个背压式的网络请求对象（即Observable）使用Observable去操作的时候，如果配置CallAdapter的时候用的是默认的Rxjava2CallAdapterFactory，那么，默认是同步的，所以使用的时候如果要拿回掉，就必须去指定subscrib的线程和observa的线程
+
+```kotlin
+serviceApi.run {
+    getForString(ApiConfig.HotCreditCardList,map).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe ({
+                
+            },{
+                
+            } 
+            )
+
+}
+```
+
+如果每次调用的时候要写这么多东西，其实和用Java是差不多的，利用kotlin的类扩展的话，我们就能优化不少。
+
+类扩展这里就不详细说了，首先我们创建一个Extension.kt,然后在这个文件的顶层（必须是顶层），创建我们的扩展方法
+
+```kotlin
+fun Observable<String>.fetchData(comp: CompositeDisposable, onSucess: Consumer<JsonElement>.(e:JsonElement)->Unit, onError: Consumer<Throwable>.(e:Throwable)->Unit){
+   comp.add(this.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).flatMap<JsonObject>(Function {
+
+        Observable.just(JsonParser().parse(it).asJsonObject)
+    })
+            .compose(RxjavaUtils.handleResult()).subscribe(object :Consumer<JsonElement>{
+                override fun accept(t: JsonElement?) {
+                    t?.let { onSucess(it) }
+                }
+            },
+                    object :Consumer<Throwable>{
+                        override fun accept(t: Throwable?) {
+                            t?.let { onError(it) }
+                        }
+
+                    } ))
+}
+```
+
+在这个扩展方法中，我们加入了很多的东西，订阅统一管理，订阅流的转化，线程的指定，以及回调的执行，其中我们把回调的部分抽成了两个高阶函数 一个叫onSuccess，一个叫onError，这样我们就完成了一个回调执行代码可灵活传入的带统一订阅管理的一个API调用。
+
+```kotlin
+serviceApi.run {
+    getForString(ApiConfig.HotCreditCardList,map).fetchData(getCompositeDisposable(),{
+        OnHotCardGet(it)
+    },{
+        onHotCardGetFail(it)
+    })
+```
+
+CompositeDisposable对象是我封装在activity基类中的一个实例，可以在界面销毁的时候统一结束掉当前界面的所有api请求，调用过程是不是很简洁而且逻辑清晰？高阶函数还有很多实用的地方，让我们一起来探索吧！
