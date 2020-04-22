@@ -45,5 +45,9 @@ HTTPS的核心就是加密数据部分使用公钥加密，私钥解密，验证
 
 一般我们使用https协议会有两种情况，第一种就是最常见的服务器发送证书的情况，这种情况客户端一般不用做特殊的处理。第二种就是证书不是通过服务器发送的，是在客户端自己去解析并信任的，也叫做自签名证书。
 
+getResponseWithInterceptorChain
 
+自签名证书快捷使用方法：
+
+okhttpclient.builder().certificatePinner(CertificatePinner.Builder().add(hostname,公钥).buid()即可
 
